@@ -5,9 +5,6 @@
 #include <array>
 #include <cassert>
 
-// TODO: Replace with error return
-#include <iostream>
-
 #include <conflict/info.hpp>
 #include <conflict/error.hpp>
 #include <conflict/detail.hpp>
