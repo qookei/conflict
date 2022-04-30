@@ -5,7 +5,9 @@
 #include <cstddef>
 #include <iostream>
 #include <string_view>
+#include <variant>
 
+#include <conflict/error.hpp>
 #include <conflict/detail.hpp>
 
 namespace conflict {
@@ -63,21 +65,21 @@ struct parser {
 		}, options);
 	}
 
-	void parse(int argc, const char **argv, std::vector<std::string_view> &positional) const {
+	status parse(int argc, const char **argv, std::vector<std::string_view> &positional) const {
 		std::vector<std::string_view> args{argv, argv + argc};
 		return parse(args, positional);
 	}
 
-	void parse(const std::vector<std::string_view> &args, std::vector<std::string_view> &positional) const {
-		auto try_parse_arg = [&] (size_t &i) -> bool {
+	status parse(const std::vector<std::string_view> &args, std::vector<std::string_view> &positional) const {
+		auto parse_arg = [&] (size_t &i) -> status {
 			auto arg = args[i];
 
 			if (arg.size() < 2)
-				return false;
+				return status{error::invalid_option, arg};
 
 			bool is_long = arg[1] == '-';
 
-			auto try_process_opt = [&] (const auto &opt) -> bool {
+			auto process_opt = [&] (const auto &opt) -> std::variant<bool, status> {
 				if (!is_long && !opt.info.short_opt)
 					return false;
 
@@ -99,15 +101,13 @@ struct parser {
 						next_arg = arg.substr(3 + opt.info.long_opt.size());
 					} else {
 						if (i == args.size() - 1) {
-							// TODO: better error message
-							std::cerr << "Missing argument\n";
-							std::exit(1);
+							return status{error::missing_argument, arg};
 						} else {
 							next_arg = args[++i];
 						}
 					}
 
-					opt.try_process_arg(next_arg);
+					return opt.process_arg(next_arg);
 				} else {
 					return arg.back() != '=';
 				}
@@ -115,24 +115,36 @@ struct parser {
 				return true;
 			};
 
-			return std::apply([&] (const auto &...ts) {
-				return (try_process_opt(ts) || ...);
+			return std::apply([&] (const auto &...ts) -> status {
+				status st{};
+				std::variant<bool, status> ret{};
+
+				bool ok = (((ret = process_opt(ts)),
+					std::holds_alternative<status>(ret)
+						? ((st = std::get<status>(ret)), false)
+						: !std::get<bool>(ret)
+					) && ...);
+
+				if (ok && st)
+					st = status{error::invalid_option, arg};
+
+				return st;
 			}, options);
 		};
 
 		for (size_t i = 0; i < args.size(); i++) {
 			auto arg = args[i];
 			if (arg.size() > 1 && arg[0] == '-') {
-				if (!try_parse_arg(i)) {
-					//std::cerr << "Unknown option: " << arg << "\n";
-					//std::exit(1);
-					positional.push_back(arg);
+				if (auto st = parse_arg(i); !st) {
+					return st;
 				}
 
 			} else {
 				positional.push_back(arg);
 			}
 		}
+
+		return status{};
 	}
 
 	std::tuple<Ts...> options;

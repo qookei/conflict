@@ -4,6 +4,7 @@
 #include <string_view>
 #include <conflict/info.hpp>
 #include <conflict/detail.hpp>
+#include <conflict/error.hpp>
 
 namespace conflict {
 
@@ -24,8 +25,10 @@ struct string_option {
 
 	void apply_default() const {}
 
-	void try_process_arg(std::string_view arg) const {
+	status process_arg(std::string_view arg) const {
 		target = arg;
+
+		return status{};
 	}
 };
 
@@ -46,8 +49,10 @@ struct strings_option {
 
 	void apply_default() const {}
 
-	void try_process_arg(std::string_view arg) const {
+	status process_arg(std::string_view arg) const {
 		target.push_back(arg);
+
+		return status{};
 	}
 };
 

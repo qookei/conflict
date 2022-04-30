@@ -7,6 +7,7 @@ if get_option('install_headers')
 	install_headers(
 		'include/conflict/conflict.hpp',
 		'include/conflict/info.hpp',
+		'include/conflict/error.hpp',
 		'include/conflict/choice.hpp',
 		'include/conflict/option.hpp',
 		'include/conflict/string.hpp',

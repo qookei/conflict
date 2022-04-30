@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <conflict/info.hpp>
+#include <conflict/error.hpp>
 #include <conflict/detail.hpp>
 
 namespace conflict {
@@ -80,7 +81,7 @@ struct choice {
 		}
 	}
 
-	void try_process_arg(std::string_view arg) const {
+	status process_arg(std::string_view arg) const {
 		size_t j = 0;
 
 		while (j < arg.size()) {
@@ -123,12 +124,13 @@ struct choice {
 			}
 
 			if (!found) {
-				std::cerr << "Invalid flag " << part << "\n";
-				std::exit(1);
+				return status{error::invalid_argument, part, info.long_opt};
 			}
 
 			j = comma + 1;
 		}
+
+		return status{};
 	}
 };
 
