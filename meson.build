@@ -14,6 +14,12 @@ if get_option('install_headers')
 		'include/conflict/parser.hpp',
 		'include/conflict/detail.hpp',
 		subdir : 'conflict')
+
+	pkg = import('pkgconfig')
+	pkg.generate(name : 'conflict',
+		description : 'C++17 command-line argument parsing library',
+		url : 'https://github.com/qookei/conflict',
+		subdirs : '.')
 endif
 
 if get_option('build_tests')
