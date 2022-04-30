@@ -8,3 +8,6 @@ test_exe = executable('tests',
 	dependencies : [ conflict_dep, gtest_dep ])
 
 test('tests', test_exe)
+
+example_exe = executable('example',
+	'example.cpp', dependencies : [ conflict_dep ])
