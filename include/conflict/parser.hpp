@@ -67,10 +67,19 @@ struct parser {
 
 	status parse(int argc, const char **argv, std::vector<std::string_view> &positional) const {
 		std::vector<std::string_view> args{argv, argv + argc};
+		return parse(args, &positional);
+	}
+
+	status parse(int argc, const char **argv, std::vector<std::string_view> *positional = nullptr) const {
+		std::vector<std::string_view> args{argv, argv + argc};
 		return parse(args, positional);
 	}
 
 	status parse(const std::vector<std::string_view> &args, std::vector<std::string_view> &positional) const {
+		return parse(args, &positional);
+	}
+
+	status parse(const std::vector<std::string_view> &args, std::vector<std::string_view> *positional = nullptr) const {
 		auto parse_arg = [&] (size_t &i) -> status {
 			auto arg = args[i];
 
@@ -142,7 +151,10 @@ struct parser {
 				}
 
 			} else {
-				positional.push_back(arg);
+				if (positional)
+					positional->push_back(arg);
+				else
+					return status{error::invalid_option, arg};
 			}
 		}
 
