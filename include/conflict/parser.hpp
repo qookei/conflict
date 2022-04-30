@@ -109,6 +109,8 @@ struct parser {
 
 					return opt.process_arg(next_arg);
 				} else {
+					opt.set();
+
 					return arg.back() != '=';
 				}
 

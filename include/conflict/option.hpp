@@ -23,6 +23,10 @@ struct option {
 	void apply_default() const {
 		target |= set_by_default ? flag_bit : 0;
 	}
+
+	void set() const {
+		target |= flag_bit;
+	}
 };
 
 } // namespace conflict
