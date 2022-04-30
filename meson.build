@@ -16,3 +16,6 @@ if get_option('install_headers')
 		subdir : 'conflict')
 endif
 
+if get_option('build_tests')
+	subdir('tests/')
+endif
