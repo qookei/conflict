@@ -65,6 +65,16 @@ struct parser {
 		}, options);
 	}
 
+	status parse(int argc, char **argv, std::vector<std::string_view> &positional) const {
+		std::vector<std::string_view> args{argv, argv + argc};
+		return parse(args, &positional);
+	}
+
+	status parse(int argc, char **argv, std::vector<std::string_view> *positional = nullptr) const {
+		std::vector<std::string_view> args{argv, argv + argc};
+		return parse(args, positional);
+	}
+
 	status parse(int argc, const char **argv, std::vector<std::string_view> &positional) const {
 		std::vector<std::string_view> args{argv, argv + argc};
 		return parse(args, &positional);
