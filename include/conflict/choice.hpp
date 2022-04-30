@@ -81,6 +81,8 @@ struct choice {
 	status process_arg(std::string_view arg) const {
 		size_t j = 0;
 
+		bool updated = false;
+
 		while (j < arg.size()) {
 			auto comma = arg.find(',', j);
 
@@ -98,12 +100,9 @@ struct choice {
 
 			for (const auto &flag : flags) {
 				if (flg == flag.info.long_opt) {
-					found = true;
-
 					if (mode == choice_mode::replace) {
-						if (unset) {
-							found = false;
-							break;
+						if (unset || updated) {
+							return status{error::invalid_argument, part, info.long_opt};
 						}
 
 						target = flag.flag_bit;
@@ -115,6 +114,9 @@ struct choice {
 						else
 							target |= flag.flag_bit;
 					}
+
+					found = true;
+					updated = true;
 
 					break;
 				}
