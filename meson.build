@@ -2,6 +2,7 @@ project('conflict', 'cpp', version : '0.1', license : 'zlib', default_options : 
 
 conflict_inc = include_directories('include')
 conflict_dep = declare_dependency(include_directories : conflict_inc)
+meson.override_dependency('conflict', conflict_dep)
 
 if get_option('install_headers')
 	install_headers(
