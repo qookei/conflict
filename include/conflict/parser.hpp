@@ -48,8 +48,6 @@ struct parser {
 			opt.print_extra(pr);
 		};
 
-		std::cout << "Options:\n";
-
 		std::apply([&] (const auto &...ts) {
 			(print_option(ts), ...);
 		}, options);

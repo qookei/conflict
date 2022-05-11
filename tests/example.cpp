@@ -44,6 +44,7 @@ int main(int argc, char **argv) {
 	conflict::default_report(st);
 
 	if (flags & (1 << 0)) {
+		std::cout << "Options:\n";
 		parser.print_help();
 		return 0;
 	}
